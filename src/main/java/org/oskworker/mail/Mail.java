@@ -3,11 +3,15 @@ package org.oskworker.mail;
 import org.oskworker.mail.configure.Configure;
 import org.oskworker.mail.entity.BasicEmail;
 import org.oskworker.mail.entity.Email;
+import org.oskworker.mail.entity.MiddleWareEmail;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -41,12 +45,39 @@ public class Mail {
     }
 
     /**
+     * 自动识别smtp主机
+     * 支持：163，126，qq
+     * @param sender
+     * @param password
+     * @return
+     */
+    public static Mail configure(String sender, String password) {
+
+        String host = "smtp.163.com";
+
+        Configure configure = new Configure(host, sender, password, 25, false);
+        return configure(configure);
+    }
+
+    /**
      * 从配置文件中读取
      * @return
      */
     public static Mail configure() {
 
-        return new Mail();
+        try {
+            Properties properties = System.getProperties();
+            properties.load(new FileInputStream(new File("src/main/resources/mail.properties")));
+            String host = properties.getProperty("smtp.host");
+            String sender = properties.getProperty("sender");
+            String password = properties.getProperty("password");
+
+            Configure configure = new Configure(host, sender, password, 25, false);
+            return configure(configure);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -83,11 +114,17 @@ public class Mail {
     }
 
     public Mail make(Email mail) {
-        MimeMessage message = new MimeMessage(session);
+//        MimeMessage message = new MimeMessage(session);
+//        try {
+//            message.setFrom(configure.getSender());
+//            message.setSubject(mail.subject());
+//            message.setText(mail.content());
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        }
+        MiddleWareEmail message = null;
         try {
-            message.setFrom(configure.getSender());
-            message.setSubject(mail.subject());
-            message.setText(mail.content());
+            message = new MiddleWareEmail(session,mail.subject(),mail.content(),mail.attachment());
         } catch (MessagingException e) {
             e.printStackTrace();
         }

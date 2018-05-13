@@ -17,6 +17,7 @@ public class BasicEmail implements Email {
     private String content;
 //    private String[] recipients;
 
+    private String[] attachment;
 
     public BasicEmail(String subject, String content) {
         this.subject = subject;
@@ -29,5 +30,9 @@ public class BasicEmail implements Email {
 
     public String content() {
         return content;
+    }
+
+    public String[] attachment() {
+        return attachment;
     }
 }

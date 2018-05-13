@@ -8,6 +8,6 @@ public interface Email {
     String subject();
 
     String content();
-//
-//    String[] recipients();
+
+    String[] attachment();
 }

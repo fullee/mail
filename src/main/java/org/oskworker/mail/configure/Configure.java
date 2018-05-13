@@ -4,6 +4,7 @@ import com.sun.istack.internal.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <h1>配置类</h1>
@@ -12,6 +13,7 @@ import lombok.Setter;
  */
 @Builder
 @Getter
+@ToString
 public class Configure {
 
     private final String stmp;
