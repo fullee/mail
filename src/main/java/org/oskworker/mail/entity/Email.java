@@ -5,4 +5,9 @@ package org.oskworker.mail.entity;
  */
 public interface Email {
 
+    String subject();
+
+    String content();
+//
+//    String[] recipients();
 }
