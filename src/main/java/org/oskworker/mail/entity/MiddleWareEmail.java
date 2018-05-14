@@ -1,19 +1,18 @@
 package org.oskworker.mail.entity;
 
-import javax.mail.Folder;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.internet.InternetHeaders;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by full on 2018/5/13.
  */
-public class MiddleWareEmail extends MimeMessage implements Email {
+public class MiddleWareEmail extends MimeMessage {
 
     public MiddleWareEmail(Session session) {
         super(session);
@@ -45,26 +44,17 @@ public class MiddleWareEmail extends MimeMessage implements Email {
         Multipart multipart = new MimeMultipart();
         if (attachment.length == 0) {
             this.setText(content);
-        }else
-        if (content != null && "".equals(content)) {
+        } else if (content != null && "".equals(content)) {
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setText(content);
             multipart.addBodyPart(mimeBodyPart);
         }
 
 
-
     }
 
-    public String subject() {
-        return null;
-    }
+    public MiddleWareEmail(Session session, Email email) throws MessagingException, UnsupportedEncodingException {
+        super(session);
 
-    public String content() {
-        return null;
-    }
-
-    public String[] attachment() {
-        return new String[0];
     }
 }

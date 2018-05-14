@@ -22,6 +22,11 @@ import java.util.Properties;
  */
 public class TestEmail {
 
+    /**
+     * 发送简单邮件
+     * @throws MessagingException
+     * @throws UnsupportedEncodingException
+     */
     @Test
     public void sendMail() throws MessagingException, UnsupportedEncodingException {
         final String userName = "icngor@163.com"; // 发件人邮箱
@@ -72,6 +77,9 @@ public class TestEmail {
 
     String host = "smtp.163.com";
 
+    /**
+     * 发送简单邮件
+     */
     @Test
     public void testSendSimpleMail() {
 
@@ -116,6 +124,7 @@ public class TestEmail {
         }
     }
 
+
     @Test
     public void testSendAttachmentMail() throws UnsupportedEncodingException {
         // Recipient's email ID needs to be mentioned.
@@ -155,27 +164,24 @@ public class TestEmail {
                     InternetAddress.parse(to));
 
             // Set Subject: header field
-            message.setSubject("Testing Subject");
+            message.setSubject("邮件标题");
 
             // Create a multipar message
             Multipart multipart = new MimeMultipart();
 
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("你好啊");
+            messageBodyPart.setText("bodyPart内容");
 
             multipart.addBodyPart(messageBodyPart);
 
-            messageBodyPart = new MimeBodyPart();
-            String filename = "C:\\Users\\full\\Desktop\\协群组织结构.png";
-            DataSource source = new FileDataSource(filename);
-            messageBodyPart.setDataHandler(new DataHandler(source));
-            messageBodyPart.setFileName(MimeUtility.encodeText("西区全.png"));
-            multipart.addBodyPart(messageBodyPart);
+//            messageBodyPart = new MimeBodyPart();
+//            String filename = "C:\\Users\\full\\Desktop\\协群组织结构.png";
+//            DataSource source = new FileDataSource(filename);
+//            messageBodyPart.setDataHandler(new DataHandler(source));
+//            messageBodyPart.setFileName(MimeUtility.encodeText("西区全.png"));
+//            multipart.addBodyPart(messageBodyPart);
 
-            // Send the complete message parts
             message.setContent(multipart);
-
-            // Send message
             Transport.send(message);
 
             System.out.println("Sent message successfully....");
@@ -279,7 +285,7 @@ public class TestEmail {
             // add image to the multipart
             multipart.addBodyPart(messageBodyPart);
 
-            // put everything together
+
             message.setContent(multipart);
             // Send message
             Transport.send(message);

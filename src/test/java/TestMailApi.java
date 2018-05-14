@@ -2,6 +2,7 @@ import org.junit.Test;
 import org.oskworker.mail.EM;
 import org.oskworker.mail.Mail;
 import org.oskworker.mail.configure.Configure;
+import org.oskworker.mail.entity.AttachmentEmail;
 import org.oskworker.mail.entity.BasicEmail;
 
 import javax.mail.internet.AddressException;
@@ -66,5 +67,15 @@ public class TestMailApi {
         EM.configure().make("母亲节", "五月13号，今天是母亲节，妈，节日快乐").sendTo("1192577322@qq.com");
     }
 
+    @Test
+    public void testAttachment() {
+        AttachmentEmail build = AttachmentEmail.builder().subject("这是一个主题")
+                //.attachment(new String[]{"C:\\Users\\full\\Desktop\\error.log.txt"})
+                .content("李文良十条狗啊")
+                .build();
+
+        EM.configure().make(build).sendTo("icngor@163.com");
+
+    }
 
 }

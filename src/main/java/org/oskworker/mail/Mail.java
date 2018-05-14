@@ -1,17 +1,20 @@
 package org.oskworker.mail;
 
 import org.oskworker.mail.configure.Configure;
+import org.oskworker.mail.entity.AttachmentEmail;
 import org.oskworker.mail.entity.BasicEmail;
 import org.oskworker.mail.entity.Email;
 import org.oskworker.mail.entity.MiddleWareEmail;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
+import javax.mail.internet.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -113,7 +116,7 @@ public class Mail {
         return this;
     }
 
-    public Mail make(Email mail) {
+    public Mail make(Email email) {
 //        MimeMessage message = new MimeMessage(session);
 //        try {
 //            message.setFrom(configure.getSender());
@@ -122,13 +125,45 @@ public class Mail {
 //        } catch (MessagingException e) {
 //            e.printStackTrace();
 //        }
-        MiddleWareEmail message = null;
         try {
-            message = new MiddleWareEmail(session,mail.subject(),mail.content(),mail.attachment());
+            MimeMessage message = new MimeMessage(session);
+            message.setSubject(email.subject());
+            message.setFrom(configure.getSender());
+            // 纯文本
+            if (email instanceof BasicEmail) {
+                message.setText(email.content());
+            }
+
+            MimeMultipart mPart = new MimeMultipart();
+            // HTML 带图片
+
+            // 附件
+            if (email instanceof AttachmentEmail) {
+                if (!"".equals(email.content()) && email.content() != null) {
+                    BodyPart bodyPart = new MimeBodyPart();
+                    bodyPart.setText(email.content());
+                    mPart.addBodyPart(bodyPart);
+                }
+                String[] attachment = email.attachment();
+                for (int i = 0; i < attachment.length; i++) {
+                    String filePath = attachment[i];
+                    String fileName = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+
+                    BodyPart bodyPart = new MimeBodyPart();
+                    DataSource source = new FileDataSource(filePath);
+                    bodyPart.setDataHandler(new DataHandler(source));
+                    bodyPart.setFileName(MimeUtility.encodeText(fileName));
+                    mPart.addBodyPart(bodyPart);
+                }
+                message.setContent(mPart);
+            }
+            this.message = message;
         } catch (MessagingException e) {
             e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-        this.message = message;
+
         return this;
     }
 
@@ -149,5 +184,4 @@ public class Mail {
         List<String> mailList = Arrays.asList(mails);
         sendTo(mailList);
     }
-
 }

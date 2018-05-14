@@ -3,11 +3,14 @@ package org.oskworker.mail.entity;
 /**
  * Created by full on 2018/5/6.
  */
-public interface Email {
+public abstract class Email {
+    String subject;
+    String content;
+    String[] attachment;
 
-    String subject();
+    public abstract String subject();
 
-    String content();
+    public abstract String content();
 
-    String[] attachment();
+    public abstract String[] attachment();
 }
