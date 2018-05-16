@@ -1,14 +1,12 @@
 package org.oskworker.mail.configure;
 
-import com.sun.istack.internal.Nullable;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
  * <h1>配置类</h1>
- * 可以使用API，注解，配置文件
+ * 可以使用API，配置文件
  * Created by full on 2018/5/6.
  */
 @Builder

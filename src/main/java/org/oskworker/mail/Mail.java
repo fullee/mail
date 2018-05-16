@@ -1,20 +1,15 @@
 package org.oskworker.mail;
 
 import org.oskworker.mail.configure.Configure;
-import org.oskworker.mail.entity.AttachmentEmail;
 import org.oskworker.mail.entity.BasicEmail;
 import org.oskworker.mail.entity.Email;
-import org.oskworker.mail.entity.MiddleWareEmail;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -27,7 +22,9 @@ public class Mail {
     private Configure configure;
     private Session session;
     private MimeMessage message;
-    protected Mail() {}
+
+    protected Mail() {
+    }
 
     protected Mail(Session session, Configure configure) {
         this.configure = configure;
@@ -36,12 +33,13 @@ public class Mail {
 
     /**
      * 极简配置
+     *
      * @param host
      * @param sender
      * @param password
      * @return
      */
-    public static Mail configure(String host,String sender,String password){
+    public static Mail configure(String host, String sender, String password) {
         Configure configure = new Configure(host, sender, password, 25, false);
 
         return configure(configure);
@@ -50,13 +48,29 @@ public class Mail {
     /**
      * 自动识别smtp主机
      * 支持：163，126，qq
+     *
      * @param sender
      * @param password
      * @return
      */
     public static Mail configure(String sender, String password) {
-
+//        腾讯QQ邮箱：smtp.qq.com  smtp/pop3开启：http://service.mail.qq.com/cgi-bin/help?subtype=1&&id=28&&no=166 （注意腾讯邮箱要单独设置安全码 点击查看说明）
+//        网易163邮箱：smtp.163.net smtp/pop3开启：http://help.163.com/10/0312/13/61J0LI3200752CLQ.html（注意网易免费邮箱smtp密码要单独设置 点击查看说明）
+//        新浪免费邮箱：smtp.sina.com  smtp/pop3开启：http://mail.sina.com.cn/help2/client01.html
+//        腾讯企业邮箱：smtp.exmail.qq.com
+//        雅虎免费邮箱：smtp.mail.yahoo.cn
+//        网易126邮箱：smtp.126.com
+//        搜狐免费邮箱：smtp.sohu.com
+//        Gmail邮箱：smtp.gmail.com　（目前gmail在国内一般用不了）
         String host = "smtp.163.com";
+        String suffix = sender.substring(sender.lastIndexOf("@"));
+        if (suffix.equals("qq.com")) {
+            host = "smtp.qq.com";
+        } else if (suffix.equals("126.com")) {
+            host = "smtp.126.com";
+        } else if (suffix.equals("sina.com") || suffix.equals("sina.cn")) {
+            host = "smtp.sina.com";
+        }
 
         Configure configure = new Configure(host, sender, password, 25, false);
         return configure(configure);
@@ -64,6 +78,7 @@ public class Mail {
 
     /**
      * 从配置文件中读取
+     *
      * @return
      */
     public static Mail configure() {
@@ -85,6 +100,7 @@ public class Mail {
 
     /**
      * 传入配置对象
+     *
      * @param configure
      * @return this
      */
@@ -101,11 +117,12 @@ public class Mail {
                     }
                 });
         session.setDebug(configure.isDebug());
-        return new Mail(session,configure);
+        return new Mail(session, configure);
     }
 
     /**
      * 极简创建邮件对象
+     *
      * @param subject
      * @param content
      * @return
@@ -117,14 +134,7 @@ public class Mail {
     }
 
     public Mail make(Email email) {
-//        MimeMessage message = new MimeMessage(session);
-//        try {
-//            message.setFrom(configure.getSender());
-//            message.setSubject(mail.subject());
-//            message.setText(mail.content());
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//        }
+
         try {
             MimeMessage message = new MimeMessage(session);
             message.setSubject(email.subject());
@@ -134,33 +144,8 @@ public class Mail {
                 message.setText(email.content());
             }
 
-            MimeMultipart mPart = new MimeMultipart();
-            // HTML 带图片
-
-            // 附件
-            if (email instanceof AttachmentEmail) {
-                if (!"".equals(email.content()) && email.content() != null) {
-                    BodyPart bodyPart = new MimeBodyPart();
-                    bodyPart.setText(email.content());
-                    mPart.addBodyPart(bodyPart);
-                }
-                String[] attachment = email.attachment();
-                for (int i = 0; i < attachment.length; i++) {
-                    String filePath = attachment[i];
-                    String fileName = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
-
-                    BodyPart bodyPart = new MimeBodyPart();
-                    DataSource source = new FileDataSource(filePath);
-                    bodyPart.setDataHandler(new DataHandler(source));
-                    bodyPart.setFileName(MimeUtility.encodeText(fileName));
-                    mPart.addBodyPart(bodyPart);
-                }
-                message.setContent(mPart);
-            }
             this.message = message;
         } catch (MessagingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -172,7 +157,7 @@ public class Mail {
 
         for (int i = 0; i < mails.size(); i++) {
             try {
-                message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(mails.get(i)));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mails.get(i)));
                 Transport.send(message);
             } catch (MessagingException e) {
                 e.printStackTrace();
