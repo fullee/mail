@@ -6,7 +6,11 @@
 ## 使用
 * dependency
 ```$xslt
-
+<dependency>
+    <groupId>io.github.oskworker</groupId>
+    <artifactId>osk-mail</artifactId>
+    <version>0.1</version>
+</dependency>
 ```
 
 ```$xslt
